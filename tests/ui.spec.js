@@ -353,7 +353,7 @@ test("legacy migration requires explicit review before writing and preserves che
   await expect(page.locator(".records")).toContainText("歷史查詢");
 });
 
-test("rollout review can read and back up original data but does not expose mutations or imports", async ({
+test("rollout review previews new-loan settings and backs up originals without allowing saves or imports", async ({
   page,
 }) => {
   await mockStore(page);
@@ -369,9 +369,17 @@ test("rollout review can read and back up original data but does not expose muta
   await expect(
     page.getByText("這是上線前的唯讀預覽", { exact: false }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "新增借貸", exact: true }).click();
+  await dialog(page).getByLabel("借款人／項目名稱").fill("預覽借款人");
+  await dialog(page).getByLabel("初次借出金額（元）").fill("12345");
+  await dialog(page).getByLabel("年利率（%）").fill("3.5");
+  await dialog(page).getByRole("button", { name: "預覽變更" }).click();
+  await expect(dialog(page).locator(".preview")).toContainText("12,345");
+  await expect(dialog(page).locator(".preview")).toContainText("3.5%");
   await expect(
-    page.getByRole("button", { name: "新增借貸", exact: true }),
-  ).toHaveCount(0);
+    dialog(page).getByRole("button", { name: "唯讀預覽，不會儲存" }),
+  ).toBeDisabled();
+  await dialog(page).getByRole("button", { name: "關閉", exact: true }).click();
   await page.getByRole("button", { name: "查看 唯讀借款人" }).click();
   await expect(page.getByRole("button", { name: "借出／還本金" })).toHaveCount(
     0,

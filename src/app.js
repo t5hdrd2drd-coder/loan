@@ -202,7 +202,7 @@ function loginPage() {
   return `<div class="login-page"><section class="login-art">${brand()}<h1>每一筆往來，<br>都值得好好記下。</h1><p>本金、利息與每次還款，一目了然。<br>讓人情有溫度，也讓帳目有依據。</p></section><section class="login-form"><div class="eyebrow">YOUR PERSONAL LEDGER</div><h2>歡迎回到你的帳本</h2><p>使用你的 Google 帳號管理借貸。<br>登入狀態會保留，下次打開即可繼續。</p><button class="btn btn-primary" data-action="login">${icon("lock")} 使用 Google 登入</button><button class="btn btn-secondary" data-action="demo">先體驗示範帳本 ${icon("arrow")}</button>${authError ? `<p class="error-text" role="alert">${esc(authError)}</p>` : ""}${state.user ? `<div class="notice error">這個帳號尚未取得管理權限。${!store?.ready ? "請依部署說明設定管理者 UID。" : ""}</div><div class="uid">你的 Firebase UID：<br>${esc(state.user.uid)}</div><button class="text-button" data-action="logout">登出並更換帳號</button>` : ""}${!store?.ready ? '<div class="notice info">新版已備妥。正式使用前，需設定管理者帳號與 Firebase 安全規則。<button class="btn btn-small btn-secondary" data-action="setup">查看設定步驟</button></div>' : ""}<div class="login-note">${icon("lock")} 僅指定的管理者能編輯帳目。<br>借款人透過專屬連結查看，不需要登入。</div></section></div>`;
 }
 function shell(body) {
-  return `<div class="shell"><aside class="sidebar">${brand()}<div class="nav-title">WORKSPACE</div><nav><button class="nav-button ${state.view === "overview" ? "active" : ""}" data-action="overview">${icon("grid")} 帳本總覽 <small>${state.loans.filter((l) => !l.deletedAt).length}</small></button><button class="nav-button ${state.view === "trash" ? "active" : ""}" data-action="trash">${icon("trash")} 回收區</button><button class="nav-button" data-action="backup">${icon("download")} ${reviewOnly() ? "帳目備份" : "備份與還原"}</button></nav><div class="sidebar-bottom"><p>把帳記清楚，<br>把心留給重要的事。</p><p class="mini">每一筆，都安心。</p></div></aside><main class="main"><header class="topbar"><div class="topbar-left"><span class="status-dot ${!state.online ? "off" : ""}"></span><span>${state.demo ? "示範帳本 · 不會修改正式資料" : !state.online ? "目前離線 · 暫停儲存" : state.synced ? "雲端同步已連線" : "正在連接雲端…"}</span></div><div class="top-actions"><span class="top-date">${today().replaceAll("-", " / ")}</span><span class="avatar">${esc(state.demo ? "示" : (state.user?.displayName || "我").slice(0, 1))}</span><button class="text-button" data-action="logout">${state.demo ? "離開示範" : "登出"}</button></div></header>${state.demo ? '<div class="notice info">目前是示範模式，所有修改僅在本次頁面中生效，不會寫入你的雲端帳目。</div>' : ""}${reviewOnly() ? '<div class="notice info">這是上線前的唯讀預覽，可查看、試算與備份。原始紀錄不會被修改；正式發布後才開放編輯。<button class="btn btn-small btn-secondary" data-action="export-json">下載原始備份</button></div>' : ""}${state.connectionError ? `<div class="notice error" role="alert">${esc(state.connectionError)}</div>` : ""}${state.errors.length ? `<div class="notice error">${state.errors.length} 筆帳目格式有問題，未載入畫面；原始資料仍保留，請先下載完整備份。<button class="btn btn-small btn-secondary" data-action="export-json">下載原始備份</button></div>` : ""}${state.raw.some((l) => l.schemaVersion !== 2) ? '<div class="notice">偵測到舊版帳目。預覽金額依新版方式試算；請先備份，正式使用前再核對升級結果。<button class="btn btn-small btn-secondary" data-action="migrate">核對舊資料</button></div>' : ""}${body}${footer()}</main></div>`;
+  return `<div class="shell"><aside class="sidebar">${brand()}<div class="nav-title">WORKSPACE</div><nav><button class="nav-button ${state.view === "overview" ? "active" : ""}" data-action="overview">${icon("grid")} 帳本總覽 <small>${state.loans.filter((l) => !l.deletedAt).length}</small></button><button class="nav-button ${state.view === "trash" ? "active" : ""}" data-action="trash">${icon("trash")} 回收區</button><button class="nav-button" data-action="backup">${icon("download")} ${reviewOnly() ? "帳目備份" : "備份與還原"}</button></nav><div class="sidebar-bottom"><p>把帳記清楚，<br>把心留給重要的事。</p></div></aside><main class="main"><header class="topbar"><div class="topbar-left"><span class="status-dot ${!state.online ? "off" : ""}"></span><span>${state.demo ? "示範帳本 · 不會修改正式資料" : !state.online ? "目前離線 · 暫停儲存" : state.synced ? "雲端同步已連線" : "正在連接雲端…"}</span></div><div class="top-actions"><span class="top-date">${today().replaceAll("-", " / ")}</span><span class="avatar">${esc(state.demo ? "示" : (state.user?.displayName || "我").slice(0, 1))}</span><button class="text-button" data-action="logout">${state.demo ? "離開示範" : "登出"}</button></div></header>${state.demo ? '<div class="notice info">目前是示範模式，所有修改僅在本次頁面中生效，不會寫入你的雲端帳目。</div>' : ""}${reviewOnly() ? '<div class="notice info">這是上線前的唯讀預覽，可查看、試算與備份。原始紀錄不會被修改；正式發布後才開放編輯。<button class="btn btn-small btn-secondary" data-action="export-json">下載原始備份</button></div>' : ""}${state.connectionError ? `<div class="notice error" role="alert">${esc(state.connectionError)}</div>` : ""}${state.errors.length ? `<div class="notice error">${state.errors.length} 筆帳目格式有問題，未載入畫面；原始資料仍保留，請先下載完整備份。<button class="btn btn-small btn-secondary" data-action="export-json">下載原始備份</button></div>` : ""}${state.raw.some((l) => l.schemaVersion !== 2) ? '<div class="notice">偵測到舊版帳目。預覽金額依新版方式試算；請先備份，正式使用前再核對升級結果。<button class="btn btn-small btn-secondary" data-action="migrate">核對舊資料</button></div>' : ""}${body}${footer()}</main></div>`;
 }
 function stats(loans, date = today(), detail = false) {
   const sums = loans.reduce(
@@ -215,7 +215,7 @@ function stats(loans, date = today(), detail = false) {
     },
     { principal: 0, interest: 0, count: 0 },
   );
-  return `<div class="stats"><div class="stat"><div class="stat-label">${icon("wallet")} ${detail ? "未還本金" : "未還本金總額"}</div><div class="stat-value"><small>NT$</small>${money(sums.principal)}</div><div class="stat-foot">${detail ? "借出金額扣除已還本金" : "每一筆尚待收回的本金"}</div></div><div class="stat"><div class="stat-label">${icon("chart")} ${detail ? "未收利息" : "未收利息總額"}</div><div class="stat-value"><small>NT$</small>${money(sums.interest)}</div><div class="stat-foot">計算至 ${date.replaceAll("-", " / ")}</div></div><div class="stat accent"><div class="stat-label">${icon(detail ? "book" : "people")} ${detail ? "本金與利息合計" : "進行中的帳目"}</div><div class="stat-value">${detail ? `<small>NT$</small>${money(sums.principal + sums.interest)}` : `${sums.count}<small style="display:inline;margin-left:8px">筆</small>`}</div><div class="stat-foot">${detail ? "未還本金 ＋ 未收利息" : "清楚記下每一次信任"}</div></div></div>`;
+  return `<div class="stats"><div class="stat"><div class="stat-label">${icon("wallet")} ${detail ? "未還本金" : "未還本金總額"}</div><div class="stat-value"><small>NT$</small>${money(sums.principal)}</div><div class="stat-foot">${detail ? "借出金額扣除已還本金" : "每一筆尚待收回的本金"}</div></div><div class="stat"><div class="stat-label">${icon("chart")} ${detail ? "未收利息" : "未收利息總額"}</div><div class="stat-value"><small>NT$</small>${money(sums.interest)}</div><div class="stat-foot">計算至 ${date.replaceAll("-", " / ")}</div></div><div class="stat accent"><div class="stat-label">${icon(detail ? "book" : "people")} ${detail ? "本金與利息合計" : "進行中的帳目"}</div><div class="stat-value">${detail ? `<small>NT$</small>${money(sums.principal + sums.interest)}` : `${sums.count}<small style="display:inline;margin-left:8px">筆</small>`}</div>${detail ? '<div class="stat-foot">未還本金 ＋ 未收利息</div>' : ""}</div></div>`;
 }
 function loanCard(l, i) {
   const r = calculate(l),
@@ -243,7 +243,7 @@ function overview() {
             .at(-1)
             .date.localeCompare(sortedEvents(a).at(-1).date),
   );
-  return `<div class="page-heading"><div><div class="eyebrow">${isTrash ? "RECYCLE BIN" : "A LITTLE CLARITY, EVERY DAY"}</div><h1>${isTrash ? "回收區" : "我的借貸帳本"}</h1><p>${isTrash ? "刪除的帳目暫存在這裡，隨時可以還原。" : "好好記帳，讓每一次往來都心裡有數。"}</p></div>${!isTrash && !reviewOnly() ? `<button class="btn btn-primary" data-action="new">${icon("plus")} 新增借貸</button>` : ""}</div>${!isTrash ? `<section class="welcome"><div><h2>每一筆往來，<br>清楚有序，安心在心。</h2><p>今天的本金與利息，已為你整理好了。</p></div><div class="welcome-art" aria-hidden="true"><div class="art-line">${icon("leaf")}</div><div class="art-dot">${icon("check")}</div></div></section>${stats(all)}` : ""}<div class="section-head"><h2>${isTrash ? "已刪除帳目" : "借貸對象"} <span class="count">${all.length}</span></h2><p>${isTrash ? "永久刪除後無法復原" : "金額隨日期自動試算"}</p></div><div class="tools">${
+  return `<div class="page-heading"><div>${isTrash ? '<div class="eyebrow">RECYCLE BIN</div>' : ""}<h1>${isTrash ? "回收區" : "我的借貸帳本"}</h1>${isTrash ? "<p>刪除的帳目暫存在這裡，隨時可以還原。</p>" : ""}</div>${!isTrash ? `<button class="btn btn-primary" data-action="new">${icon("plus")} 新增借貸</button>` : ""}</div>${!isTrash ? `<section class="welcome"><div><h2>每一筆往來，都清楚有序。</h2><p>今天的本金與利息，已為你整理好了。</p></div><div class="welcome-art" aria-hidden="true"><div class="art-line">${icon("leaf")}</div><div class="art-dot">${icon("check")}</div></div></section>${stats(all)}` : ""}<div class="section-head"><h2>${isTrash ? "已刪除帳目" : "借貸對象"} <span class="count">${all.length}</span></h2><p>${isTrash ? "永久刪除後無法復原" : "金額隨日期自動試算"}</p></div><div class="tools">${
     !isTrash
       ? `<div class="tabs" aria-label="帳目篩選">${[
           ["active", "進行中"],
@@ -267,7 +267,7 @@ function overview() {
     )
     .join(
       "",
-    )}</select></div></div><div class="loan-grid">${shown.length ? shown.map(loanCard).join("") : `<div class="empty">${icon("book")}<h3>${state.loading && !state.demo ? "正在載入帳目…" : state.search ? "沒有符合的帳目" : isTrash ? "回收區是空的" : "這裡等著你的第一筆紀錄"}</h3><p>${state.loading && !state.demo ? "正在連接你的雲端帳本。" : state.search ? "試試其他關鍵字。" : isTrash ? "你的帳目都好好保存著。" : "新增借貸對象，開始清楚記錄每次往來。"}</p>${!isTrash && !state.search && !state.loading && !reviewOnly() ? '<button class="btn btn-primary" data-action="new">新增借貸</button>' : ""}</div>`}</div>`;
+    )}</select></div></div><div class="loan-grid">${shown.length ? shown.map(loanCard).join("") : `<div class="empty">${icon("book")}<h3>${state.loading && !state.demo ? "正在載入帳目…" : state.search ? "沒有符合的帳目" : isTrash ? "回收區是空的" : "這裡等著你的第一筆紀錄"}</h3><p>${state.loading && !state.demo ? "正在連接你的雲端帳本。" : state.search ? "試試其他關鍵字。" : isTrash ? "你的帳目都好好保存著。" : "新增借貸對象，開始清楚記錄每次往來。"}</p>${!isTrash && !state.search && !state.loading ? '<button class="btn btn-primary" data-action="new">新增借貸</button>' : ""}</div>`}</div>`;
 }
 function historyHtml(l, asOf, readOnly = false) {
   const r = calculate(l, asOf),
@@ -383,6 +383,7 @@ function watchPreview(form, build, describe, commit) {
     staged = null;
     form.querySelector("#form-preview").innerHTML = "";
     form.querySelector('[type="submit"]').textContent = "預覽變更";
+    form.querySelector('[type="submit"]').disabled = false;
   });
   form.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -396,7 +397,10 @@ function watchPreview(form, build, describe, commit) {
       staged = build(new FormData(form));
       form.querySelector("#form-preview").innerHTML =
         `<div class="preview">${describe(staged)}</div>`;
-      form.querySelector('[type="submit"]').textContent = "確認並儲存";
+      form.querySelector('[type="submit"]').textContent = reviewOnly()
+        ? "唯讀預覽，不會儲存"
+        : "確認並儲存";
+      form.querySelector('[type="submit"]').disabled = reviewOnly();
     } catch (err) {
       staged = null;
       error.textContent = errorMessage(err);
@@ -406,7 +410,7 @@ function watchPreview(form, build, describe, commit) {
 function newLoan() {
   showModal(
     "新增借貸",
-    `<p class="help">為每一份信任，開一本清楚的帳。</p><form id="editor">${field("借款人／項目名稱", "name", "text", "", 'maxlength="100" required placeholder="例如：小明・資金週轉"')}${field("初次借出金額（元）", "amount", "number", "", 'min="0.01" max="1000000000" step="0.01" required inputmode="decimal" placeholder="請輸入金額"')}<div class="field-row">${field("年利率（%）", "rate", "number", "2.3", 'min="0" max="1000" step="0.0001" required')}${field("借出日期", "date", "date", today(), `max="${today()}" min="1900-01-01" required`)}</div><div class="field"><label for="f-note">私人備註（選填）</label><textarea id="f-note" name="note" maxlength="500" placeholder="備註不會出現在分享明細中"></textarea></div>${formEnd()}</form>`,
+    `<p class="help">${reviewOnly() ? "可試填對象、借款本金與利率；正式上線後才能儲存。" : "設定借貸對象、借款本金與年利率。"}</p><form id="editor">${field("借款人／項目名稱", "name", "text", "", 'maxlength="100" required placeholder="例如：小明・資金週轉"')}${field("初次借出金額（元）", "amount", "number", "", 'min="0.01" max="1000000000" step="0.01" required inputmode="decimal" placeholder="請輸入金額"')}<div class="field-row">${field("年利率（%）", "rate", "number", "2.3", 'min="0" max="1000" step="0.0001" required')}${field("借出日期", "date", "date", today(), `max="${today()}" min="1900-01-01" required`)}</div><div class="field"><label for="f-note">私人備註（選填）</label><textarea id="f-note" name="note" maxlength="500" placeholder="備註不會出現在分享明細中"></textarea></div>${formEnd()}</form>`,
   );
   watchPreview(
     modal.querySelector("form"),

@@ -311,6 +311,7 @@ svg {
   min-height: 154px;
 }
 .welcome h2 {
+  white-space: nowrap;
   font-family: "Noto Serif TC", serif;
   font-size: 24px;
   font-weight: 500;
@@ -1408,7 +1409,8 @@ dialog::backdrop {
     min-height: 134px;
   }
   .welcome h2 {
-    font-size: 20px;
+    font-size: clamp(16px, 4.8vw, 20px);
+    letter-spacing: 0.4px;
   }
   .welcome p {
     font-size: 10px;
@@ -1621,5 +1623,11 @@ dialog::backdrop {
   * {
     transition: none !important;
     scroll-behavior: auto !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-art {
+    display: none;
   }
 }
