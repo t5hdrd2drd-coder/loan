@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer"><meta name="robots" content="noindex,nofollow">
+<title>禾帳｜管理者帳號設定</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:56px 20px;font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei",sans-serif;background:#f5f7f0;color:#183e35;line-height:1.8}.card{max-width:520px;margin:auto;background:white;padding:32px;border:1px solid #dfe6d6;border-radius:18px;box-shadow:0 12px 40px #183e3509}h1{font-size:25px;margin:8px 0 14px}p{font-size:14px;color:#697960}.brand{font-size:12px;letter-spacing:3px;color:#7b9363}button{width:100%;min-height:48px;border:0;border-radius:9px;background:#183e35;color:#fff;font:inherit;padding:12px 18px;cursor:pointer;margin-top:12px}button:disabled{opacity:.5;cursor:wait}.secondary{background:#eef3e7;color:#31552d}label{display:block;font-size:13px;margin-top:18px}input{width:100%;padding:14px;border:1px solid #b9cda2;border-radius:8px;font:15px ui-monospace,monospace;color:#183e35;background:#f5f8ef;user-select:all}.note{border-top:1px solid #e3e8db;padding-top:18px;margin-top:24px;font-size:12px;color:#7c8971}.error{color:#a44638;font-size:13px;white-space:pre-line}.hidden{display:none}a{color:#31552d}button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #a1bc7b;outline-offset:3px}
+</style>
+</head>
+<body><main class="card">
+<div class="brand">HEZHANG · SETUP</div><h1>設定你的管理者帳號</h1>
+<p>用你要管理借貸帳本的 Google 帳號登入。登入後，將下方的 UID 複製並貼回與助理的對話，即可指定管理者。</p>
+<button id="login" type="button" disabled>正在準備 Google 登入…</button>
+<section id="result" class="hidden" aria-label="登入結果">
+<p id="account"></p><label for="uid">你的 Firebase UID（帳號識別碼）</label><input id="uid" readonly autocomplete="off" spellcheck="false">
+<button id="copy" type="button">複製 UID</button><button id="logout" type="button" class="secondary">更換 Google 帳號</button>
+<p>把這個 UID 貼回對話即可。UID 是帳號識別碼，不是密碼或登入權杖；登入本頁不會自動取得帳本管理權。</p>
+</section>
+<p id="status" role="status" aria-live="polite"></p><p id="error" class="error" role="alert"></p>
+<p class="note">本頁只進行 Google 登入並顯示帳號資訊，不讀取或修改任何借貸資料，也不會顯示登入權杖。<br><a href="./">返回原本的借貸帳本</a></p>
+</main>
+<script type="module">
+const loginButton=document.getElementById('login'),result=document.getElementById('result'),uidField=document.getElementById('uid'),errorBox=document.getElementById('error'),status=document.getElementById('status');
+const errors={
+ 'auth/operation-not-allowed':'請先在 Firebase Authentication 啟用 Google 登入。',
+ 'auth/unauthorized-domain':'請在 Firebase Authentication 的授權網域加入 t5hdrd2drd-coder.github.io。',
+ 'auth/popup-blocked':'瀏覽器阻擋登入視窗，請允許此網站開啟彈出式視窗後重試。',
+ 'auth/popup-closed-by-user':'登入視窗已關閉，請再試一次。',
+ 'auth/network-request-failed':'目前無法連線，請確認網路後重試。'
+};
+try {
+ const [{initializeApp},{getAuth,GoogleAuthProvider,setPersistence,browserLocalPersistence,onAuthStateChanged,signInWithPopup,signOut}]=await Promise.all([
+  import('https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js'),
+  import('https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js')
+ ]);
+ const app=initializeApp({apiKey:'AIzaSyBlhrrv6YtMOOxfo2QwOau2QO33ilH3eOg',authDomain:'my-loans-c739b.firebaseapp.com',projectId:'my-loans-c739b',storageBucket:'my-loans-c739b.firebasestorage.app',messagingSenderId:'244230822219',appId:'1:244230822219:web:11e110b43ac556de7570ce'});
+ const auth=getAuth(app);await setPersistence(auth,browserLocalPersistence);
+ const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});
+ onAuthStateChanged(auth,user=>{loginButton.disabled=false;loginButton.textContent='使用 Google 登入';result.classList.toggle('hidden',!user);loginButton.classList.toggle('hidden',!!user);uidField.value=user?.uid??'';document.getElementById('account').textContent=user?'目前帳號：'+(user.email||user.displayName||'已登入'):'';});
+ loginButton.addEventListener('click',async()=>{errorBox.textContent='';status.textContent='';loginButton.disabled=true;try{await signInWithPopup(auth,provider);}catch(e){errorBox.textContent=errors[e.code]||'登入未完成，請稍後重試或將錯誤代碼告訴助理：'+(e.code||'unknown');}finally{loginButton.disabled=false;}});
+ document.getElementById('logout').addEventListener('click',async()=>{try{await signOut(auth);status.textContent='已登出，請重新選擇管理帳號。';}catch{errorBox.textContent='無法登出，請重新整理頁面後重試。';}});
+ document.getElementById('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(uidField.value);status.textContent='UID 已複製，請貼回與助理的對話。';}catch{uidField.focus();uidField.select();status.textContent='請手動複製選取的 UID，再貼回對話。';}});
+} catch {
+ loginButton.textContent='登入服務暫時無法載入';errorBox.textContent='請檢查網路後重新整理頁面。如果持續失敗，請將畫面提供給助理。';
+}
+</script></body></html>
