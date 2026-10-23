@@ -1,0 +1,24 @@
+{
+  "name": "loan-ledger",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "node tests/core.test.js",
+    "test:ui": "playwright test",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-loan-ledger 'node tests/rules.test.js'",
+    "check:deploy": "node scripts/check-deploy.js",
+    "preview:file": "npm run build && node scripts/preview-file.js"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^4.0.1",
+    "@playwright/test": "^1.56.1",
+    "firebase": "^11.10.0",
+    "firebase-tools": "^14.22.0",
+    "prettier": "^3.9.10",
+    "vite": "^7.1.12"
+  }
+}
