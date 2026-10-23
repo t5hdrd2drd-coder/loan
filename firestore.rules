@@ -13,7 +13,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function owner() {
       // Replace with the same UID as src/config.js. Fail closed until configured.
-      return request.auth != null && request.auth.uid == 'REPLACE_WITH_OWNER_UID';
+      return request.auth != null && request.auth.uid == 'hjX3f66yfQOzWy51NQtC5AXmXdP2';
     }
     function validCommon(data) {
       return data.keys().hasAll(['schemaVersion','name','annualRate','status','version','events'])

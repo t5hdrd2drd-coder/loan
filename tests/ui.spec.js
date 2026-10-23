@@ -352,3 +352,39 @@ test("legacy migration requires explicit review before writing and preserves che
   await expect(page.locator(".record")).toHaveCount(2);
   await expect(page.locator(".records")).toContainText("歷史查詢");
 });
+
+test("rollout review can read and back up original data but does not expose mutations or imports", async ({
+  page,
+}) => {
+  await mockStore(page);
+  const { readFileSync } = await import("node:fs");
+  const html = readFileSync("index.html", "utf8").replace(
+    '<html lang="zh-Hant">',
+    '<html lang="zh-Hant" data-preview="review">',
+  );
+  await page.route("**/loan/review/", (route) =>
+    route.fulfill({ contentType: "text/html", body: html }),
+  );
+  await page.goto("/loan/review/");
+  await expect(
+    page.getByText("這是上線前的唯讀預覽", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "新增借貸", exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "查看 唯讀借款人" }).click();
+  await expect(page.getByRole("button", { name: "借出／還本金" })).toHaveCount(
+    0,
+  );
+  await expect(page.locator('[data-action="edit-event"]')).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "匯出 CSV" })).toBeVisible();
+  await page.getByRole("button", { name: "帳目備份", exact: true }).click();
+  await expect(dialog(page).locator("#import-file")).toHaveCount(0);
+  const pending = page.waitForEvent("download");
+  await dialog(page)
+    .getByRole("button", { name: "下載完整 JSON 備份" })
+    .click();
+  const dl = await pending,
+    raw = JSON.parse(await readFile(await dl.path(), "utf8"));
+  expect(raw.loans[0].id).toBe(fixture.id);
+});

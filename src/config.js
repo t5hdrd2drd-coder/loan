@@ -9,4 +9,4 @@ export const firebaseConfig = {
 };
 // Set this to your Google account's Firebase Authentication UID before publishing.
 // Also set the SAME UID in firestore.rules. Empty = no administrator access.
-export const OWNER_UID = "";
+export const OWNER_UID = "hjX3f66yfQOzWy51NQtC5AXmXdP2";

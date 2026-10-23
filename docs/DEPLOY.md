@@ -4,7 +4,7 @@
 
 ## 目前交付狀態
 
-程式可本地預覽與建置。`src/config.js` 的 OWNER_UID 留空，`firestore.rules` 的管理者 UID 為佔位值，正式發布檢查會刻意失敗，避免未設定權限就上線。新版準備於 codex/loan-ledger-v2 分支與草稿 PR 供審閱；GitHub 專案授權已確認生效。Firebase 管理權限與管理者 UID 尚未提供，未修改正式網站與雲端帳目。
+管理者 UID 已在 `src/config.js` 與 `firestore.rules` 設定一致，發布前檢查已通過；Google 登入與網站授權網域由管理者完成設定。新版位於 `codex/loan-ledger-v2` 分支及草稿 PR。正式資料庫規則尚未發布，舊帳本尚未切換。原網站另提供只顯示登入 UID 的 `setup.html`；`preview/` 是供管理者核對與下載原始備份的唯讀預覽，不會寫入帳目。
 
 ## GitHub 連線授權
 
@@ -16,14 +16,16 @@
 2. 開啟顯示的 localhost 網址。按「先體驗示範帳本」可安全體驗，重新整理後示範修改會消失。
 3. 到 Firebase 專案 `my-loans-c739b` → Authentication → Sign-in method，啟用 Google，選擇支援電子郵件。
 4. Authentication → Settings → Authorized domains，加入 `localhost` 與 `t5hdrd2drd-coder.github.io`（只填網域，不加 /loan）。
-5. 在本機新版按「使用 Google 登入」。目前沒有管理者設定，登入後會顯示「尚未取得管理權限」與你的 Firebase UID；也可到 Firebase Authentication → Users 查 UID。
+5. 可先在原網站的 `setup.html` 按「使用 Google 登入」取得 Firebase UID；也可到 Firebase Authentication → Users 查 UID。登入設定頁不會讀寫借貸帳目。
 6. 將 UID 填入 `src/config.js` 的 OWNER_UID，並替換 `firestore.rules` 的 `REPLACE_WITH_OWNER_UID`。兩處必須一致，無需把密碼或登入 token 放進程式。
 
 登入使用 browserLocalPersistence，通常關閉分頁或重開手機仍保留；無痕、清除資料、主動登出或 Google 安全要求會需要重新登入。
 
-## 2. 在本機先下載原始帳目備份
+## 2. 先下載原始帳目備份
 
-以管理者登入本機新版。若現有 Firestore 規則允許這個帳號讀取，就能看到原有帳目；點「備份與還原 → 下載完整 JSON 備份」。務必確認檔案確實已保存。
+管理者可直接開啟 https://t5hdrd2drd-coder.github.io/loan/preview/ 。預覽只開放查看、試算、CSV 與原始 JSON 備份；可按上方「下載原始備份」，不需本機安裝工具。確認帳目完整並實際保存檔案後，再發布規則與切換正式網站。預覽不會自動升級舊帳目。
+
+也可由開發者以管理者登入本機新版。若現有 Firestore 規則允許這個帳號讀取，就能看到原有帳目；點「備份與還原 → 下載完整 JSON 備份」。務必確認檔案確實已保存。
 
 如果現有規則不允許讀取，先在 Firebase Firestore → Rules 編輯器中，僅將 `/loans/{loanId}` 設為上述 OWNER_UID 可讀寫，移除任何公開讀寫規則。不要為了匯出而把整個資料庫開放。之後登入本機新版下載備份。這會讓舊版未登入網站暫時無法載入，是權限切換期間的預期狀態。
 

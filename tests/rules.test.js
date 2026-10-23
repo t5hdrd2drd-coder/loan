@@ -16,6 +16,7 @@ import {
   runTransaction,
 } from "firebase/firestore";
 import { projectShare } from "../src/core.js";
+import { OWNER_UID } from "../src/config.js";
 let env;
 const token = "a".repeat(48),
   loan = {
@@ -45,7 +46,7 @@ before(async () => {
       host: "127.0.0.1",
       port: 8085,
       rules: readFileSync("firestore.rules", "utf8").replaceAll(
-        "REPLACE_WITH_OWNER_UID",
+        OWNER_UID || "REPLACE_WITH_OWNER_UID",
         "owner",
       ),
     },
